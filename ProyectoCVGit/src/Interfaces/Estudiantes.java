@@ -95,6 +95,7 @@ public class Estudiantes extends javax.swing.JFrame {
         jbtnActualizar.setEnabled(false);
         jbtnBorrar.setEnabled(false);
         jbtnCancelar.setEnabled(false);
+        jbtnInactivar.setEnabled(false);
     }
 
     public void bloquearTextos() {
@@ -111,7 +112,7 @@ public class Estudiantes extends javax.swing.JFrame {
         jbtnCancelar.setEnabled(true);
         jbtnActualizar.setEnabled(true);
         jbtnBorrar.setEnabled(true);
-        jbtnCancelar.setEnabled(true);
+        jbtnInactivar.setEnabled(true);
     }
 
     public void bloquearTextoCedula() {
@@ -270,6 +271,36 @@ public class Estudiantes extends javax.swing.JFrame {
         }
     }
 
+    public void inactivar() {
+        String valorEstado = "inactivo";
+        if (JOptionPane.showConfirmDialog(new JInternalFrame(),
+                "Estas seguro de inactivar el estudiante",
+                "Inactivar registros", JOptionPane.WARNING_MESSAGE,
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+
+        }
+        try {
+            Conexion cc = new Conexion();
+            Connection cn = cc.conectar();
+            String sql = " ";
+            sql = "update estudiantes set est_est='" + valorEstado
+                    + "' WHERE est_cedula='" + jtxtCedula.getText() + "'";
+            PreparedStatement psd = cn.prepareStatement(sql);
+            int n = psd.executeUpdate();
+            // JOptionPane.showMessageDialog(null, psd);
+            if (n > 0) {
+                JOptionPane.showMessageDialog(null, "Se inactivo correctamente");
+                //limpiarTextos();
+                cargarTablaEstudiantes();
+                bloquearBotones();
+                bloquearTextos();
+                limpiarTextos();
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex);
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -299,7 +330,8 @@ public class Estudiantes extends javax.swing.JFrame {
         jbtnActualizar = new javax.swing.JButton();
         jbtnBorrar = new javax.swing.JButton();
         jbtnCancelar = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        jbtnInactivar = new javax.swing.JButton();
+        jbtnSalir = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -391,7 +423,7 @@ public class Estudiantes extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -427,10 +459,10 @@ public class Estudiantes extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("Inactivar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jbtnInactivar.setText("Inactivar");
+        jbtnInactivar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jbtnInactivarActionPerformed(evt);
             }
         });
 
@@ -443,7 +475,7 @@ public class Estudiantes extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jbtnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jbtnInactivar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jbtnBorrar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jbtnActualizar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
                         .addComponent(jbtnNuevo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -457,16 +489,23 @@ public class Estudiantes extends javax.swing.JFrame {
                 .addComponent(jbtnNuevo)
                 .addGap(18, 18, 18)
                 .addComponent(jbtnGuardar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
                 .addComponent(jbtnActualizar)
                 .addGap(29, 29, 29)
                 .addComponent(jbtnBorrar)
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
+                .addComponent(jbtnInactivar)
                 .addGap(18, 18, 18)
                 .addComponent(jbtnCancelar)
                 .addGap(26, 26, 26))
         );
+
+        jbtnSalir.setText("Salir");
+        jbtnSalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbtnSalirActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -481,6 +520,10 @@ public class Estudiantes extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(254, 254, 254)
+                .addComponent(jbtnSalir)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -491,7 +534,9 @@ public class Estudiantes extends javax.swing.JFrame {
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30))
+                .addGap(16, 16, 16)
+                .addComponent(jbtnSalir)
+                .addContainerGap())
         );
 
         pack();
@@ -521,12 +566,16 @@ public class Estudiantes extends javax.swing.JFrame {
         limpiarTextos();
         bloquearBotones();
         bloquearTextos();
-        
+
     }//GEN-LAST:event_jbtnCancelarActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void jbtnInactivarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnInactivarActionPerformed
+        inactivar();
+    }//GEN-LAST:event_jbtnInactivarActionPerformed
+
+    private void jbtnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnSalirActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_jbtnSalirActionPerformed
 
     /**
      * @param args the command line arguments
@@ -564,7 +613,6 @@ public class Estudiantes extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -578,7 +626,9 @@ public class Estudiantes extends javax.swing.JFrame {
     private javax.swing.JButton jbtnBorrar;
     private javax.swing.JButton jbtnCancelar;
     private javax.swing.JButton jbtnGuardar;
+    private javax.swing.JButton jbtnInactivar;
     private javax.swing.JButton jbtnNuevo;
+    private javax.swing.JButton jbtnSalir;
     private javax.swing.JTable jtblRegistros;
     private javax.swing.JTextField jtxtApellido;
     private javax.swing.JTextField jtxtCedula;
