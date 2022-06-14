@@ -5,6 +5,16 @@
  */
 package Interfaces;
 
+import ConexionSQL.Conexion;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Spc
@@ -14,8 +24,15 @@ public class Estudiantes extends javax.swing.JFrame {
     /**
      * Creates new form Estudiantes
      */
+    
+    Integer fila;
+    
     public Estudiantes() {
         initComponents();
+        cargarTablaEstudiantes();
+        bloquearTextos();
+        bloquearBotones();
+        cargarTextos();
     }
     
     public void desbloquearTextos() {
@@ -35,7 +52,197 @@ public class Estudiantes extends javax.swing.JFrame {
         jbtnBorrar.setEnabled(false);
         jbtnCancelar.setEnabled(true);
     }
+    
+    public void cargarTablaEstudiantes() {
+        DefaultTableModel modelo = new DefaultTableModel();
+        try {
+            String[] titulos = {"cedula", "nombre", "apellido", "direccion", "telefono"};
+            String[] registros = new String[5];
+            modelo = new DefaultTableModel(null, titulos);
+            Conexion cc = new Conexion();
+            java.sql.Connection cn = cc.conectar();
+            String sql = "";
+            sql = "select* from estudiantes where est_est='activo'";
+            java.sql.Statement psd = cn.createStatement();
+            ResultSet rs = psd.executeQuery(sql);
+            while (rs.next()) {
+                registros[0] = rs.getString("est_cedula");
+                registros[1] = rs.getString("est_nombre");
+                registros[2] = rs.getString("est_apellido");
+                registros[3] = rs.getString("est_direccion");
+                registros[4] = rs.getString("est_telefono");
+                modelo.addRow(registros);
+            }
+            jtblRegistros.setModel(modelo);
+        } catch (SQLException ex) {
+            JOptionPane.showConfirmDialog(null, ex);
+        }
 
+    }
+    
+    public void limpiarTextos() {
+        jtxtCedula.setText(" ");
+        jtxtNombre.setText(" ");
+        jtxtApellido.setText(" ");
+        jtxtDireccion.setText(" ");
+        jtxtTelefono.setText(" ");
+    }
+    
+    public void bloquearBotones() {
+        jbtnNuevo.setEnabled(true);
+        jbtnGuardar.setEnabled(false);
+        jbtnCancelar.setEnabled(false);
+        jbtnActualizar.setEnabled(false);
+        jbtnBorrar.setEnabled(false);
+        jbtnCancelar.setEnabled(false);
+    }
+    
+    public void bloquearTextos() {
+        jtxtCedula.setEnabled(false);
+        jtxtNombre.setEnabled(false);
+        jtxtApellido.setEnabled(false);
+        jtxtDireccion.setEnabled(false);
+        jtxtTelefono.setEnabled(false);
+    }
+    
+    public void desbloquearBotonesEditarEliminar() {
+        jbtnNuevo.setEnabled(false);
+        jbtnGuardar.setEnabled(false);
+        jbtnCancelar.setEnabled(true);
+        jbtnActualizar.setEnabled(true);
+        jbtnBorrar.setEnabled(true);
+        jbtnCancelar.setEnabled(true);
+    }
+    
+    public void bloquearTextoCedula() {
+        jtxtCedula.setEnabled(false);
+        jtxtNombre.setEnabled(true);
+        jtxtApellido.setEnabled(true);
+        jtxtDireccion.setEnabled(true);
+        jtxtTelefono.setEnabled(true);
+    }
+    
+    public void cargarTextos() {
+        jtblRegistros.getSelectionModel().addListSelectionListener(
+                new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (jtblRegistros.getSelectedRow() != -1) {
+                    fila = jtblRegistros.getSelectedRow();
+                    jtxtCedula.setText(String.valueOf(jtblRegistros.getValueAt(fila, 0)));
+                    jtxtNombre.setText(String.valueOf(jtblRegistros.getValueAt(fila, 1)));
+                    jtxtApellido.setText(String.valueOf(jtblRegistros.getValueAt(fila, 2)));
+                    jtxtDireccion.setText(String.valueOf(jtblRegistros.getValueAt(fila, 3)));
+                    jtxtTelefono.setText(String.valueOf(jtblRegistros.getValueAt(fila, 4)));
+                    desbloquearBotonesEditarEliminar();
+                    bloquearTextoCedula();
+                    cargarTablaEstudiantes();
+                }
+
+            }
+        });
+    }
+    
+    public void guardar() {
+
+        String valorTelefono = "S/N";
+        if (jtxtCedula.getText().isEmpty() || jtxtCedula.getText() == "") {
+            JOptionPane.showMessageDialog(this, "Debe ingresar la cedula");
+            jtxtCedula.requestFocus();
+        } else if (jtxtNombre.getText().isEmpty() || jtxtNombre.getText() == "") {
+            JOptionPane.showMessageDialog(this, "Debe ingresar el nombre");
+            jtxtNombre.requestFocus();
+
+        } else if (jtxtApellido.getText().isEmpty() || jtxtApellido.getText() == "") {
+            JOptionPane.showMessageDialog(this, "Debe ingresar el apellido");
+            jtxtApellido.requestFocus();
+
+        } else if (jtxtDireccion.getText().isEmpty() || jtxtDireccion.getText() == "") {
+            JOptionPane.showMessageDialog(this, "Debe ingresar la direccion");
+            jtxtDireccion.requestFocus();
+
+        } else {
+            try {
+                Conexion cc = new Conexion();
+                Connection cn = cc.conectar();
+                String sql = "";
+                sql = "INSERT INTO estudiantes(est_cedula,est_nombre,est_apellido,est_telefono,est_direccion, est_est) values(?,?,?,?,?,'activo')";
+                PreparedStatement psd = cn.prepareStatement(sql);
+                psd.setString(1, jtxtCedula.getText());
+                psd.setString(2, jtxtNombre.getText());
+                psd.setString(3, jtxtApellido.getText());
+                psd.setString(4, jtxtDireccion.getText());
+                if (jtxtTelefono.getText().isEmpty() || jtxtTelefono.getText() == "") {
+                    psd.setString(5, valorTelefono);
+                } else {
+                    psd.setString(5, jtxtTelefono.getText());
+                }
+                int n = psd.executeUpdate();
+                if (n > 0) {
+                    //  JOptionPane.showMessageDialog(null, "Se inserto correctamente");
+                }
+                limpiarTextos();
+                bloquearBotones();
+                bloquearTextos();
+                cargarTablaEstudiantes();
+
+            } catch (SQLException ex) {
+                //Logger.getLogger(Estudiantes.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(null, ex);
+
+            }
+        }
+    }
+    
+    public void editarDatos() {
+        String valorTelefono = "S/N";
+        if (jtxtCedula.getText().isEmpty() || jtxtCedula.getText() == "") {
+            JOptionPane.showMessageDialog(null, "Debe ingresar la cedula");
+            jtxtCedula.requestFocus();
+        } else if (jtxtNombre.getText().isEmpty() || jtxtNombre.getText() == "") {
+            JOptionPane.showMessageDialog(null, "Debe ingresar el Nombre");
+            jtxtNombre.requestFocus();
+        } else if (jtxtApellido.getText().isEmpty() || jtxtApellido.getText() == "") {
+            JOptionPane.showMessageDialog(null, "Debe ingresar el Apellido");
+            jtxtApellido.requestFocus();
+        } else if (jtxtDireccion.getText().isEmpty() || jtxtDireccion.getText() == "") {
+            JOptionPane.showMessageDialog(null, "Debe ingresar la Direccion");
+            jtxtDireccion.requestFocus();
+        } else {
+            try {
+                Conexion c = new Conexion();
+                Connection cn = c.conectar();
+                String sql = "";
+                if (jtxtTelefono.getText().isEmpty() || jtxtTelefono.getText() == "") {
+                    sql = "update estudiantes set est_nombre='" + jtxtNombre.getText()
+                            + "' ,est:apellido='" + jtxtApellido.getText() + "' ,est_direccion='"
+                            + jtxtDireccion.getText() + "' ,est_telefono='" + valorTelefono
+                            + "' WHERE est_cedula='"
+                            + jtxtCedula.getText() + "'";
+                } else {
+                    sql = "update estudiantes set est_nombre='" + jtxtNombre.getText()
+                            + "' ,est_apellido='" + jtxtApellido.getText() + "' ,est_direccion='"
+                            + jtxtDireccion.getText() + "' ,est_telefono='" + jtxtTelefono.getText()
+                            + "' WHERE est_cedula='"
+                            + jtxtCedula.getText() + "'";
+                }
+
+                PreparedStatement psd = cn.prepareStatement(sql);
+
+                int n = psd.executeUpdate();
+                if (n > 0) {
+                    JOptionPane.showMessageDialog(this, "Se actualizo correctamente");
+                    cargarTablaEstudiantes();
+                    limpiarTextos();
+                    bloquearBotones();
+                    bloquearTextos();
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, ex);
+            }
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -171,8 +378,18 @@ public class Estudiantes extends javax.swing.JFrame {
         });
 
         jbtnGuardar.setText("Guardar");
+        jbtnGuardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbtnGuardarActionPerformed(evt);
+            }
+        });
 
         jbtnActualizar.setText("Actualizar");
+        jbtnActualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbtnActualizarActionPerformed(evt);
+            }
+        });
 
         jbtnBorrar.setText("Borrar");
 
@@ -253,6 +470,14 @@ public class Estudiantes extends javax.swing.JFrame {
         desbloquearBotones();
         
     }//GEN-LAST:event_jbtnNuevoActionPerformed
+
+    private void jbtnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnGuardarActionPerformed
+        guardar();        
+    }//GEN-LAST:event_jbtnGuardarActionPerformed
+
+    private void jbtnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnActualizarActionPerformed
+        editarDatos();
+    }//GEN-LAST:event_jbtnActualizarActionPerformed
 
     /**
      * @param args the command line arguments
