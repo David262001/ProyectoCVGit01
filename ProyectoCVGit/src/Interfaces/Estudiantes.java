@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -24,9 +25,8 @@ public class Estudiantes extends javax.swing.JFrame {
     /**
      * Creates new form Estudiantes
      */
-    
     Integer fila;
-    
+
     public Estudiantes() {
         initComponents();
         cargarTablaEstudiantes();
@@ -34,7 +34,7 @@ public class Estudiantes extends javax.swing.JFrame {
         bloquearBotones();
         cargarTextos();
     }
-    
+
     public void desbloquearTextos() {
 
         jtxtCedula.setEnabled(true);
@@ -43,7 +43,7 @@ public class Estudiantes extends javax.swing.JFrame {
         jtxtDireccion.setEnabled(true);
         jtxtTelefono.setEnabled(true);
     }
-    
+
     public void desbloquearBotones() {
 
         jbtnNuevo.setEnabled(false);
@@ -52,7 +52,7 @@ public class Estudiantes extends javax.swing.JFrame {
         jbtnBorrar.setEnabled(false);
         jbtnCancelar.setEnabled(true);
     }
-    
+
     public void cargarTablaEstudiantes() {
         DefaultTableModel modelo = new DefaultTableModel();
         try {
@@ -79,7 +79,7 @@ public class Estudiantes extends javax.swing.JFrame {
         }
 
     }
-    
+
     public void limpiarTextos() {
         jtxtCedula.setText(" ");
         jtxtNombre.setText(" ");
@@ -87,7 +87,7 @@ public class Estudiantes extends javax.swing.JFrame {
         jtxtDireccion.setText(" ");
         jtxtTelefono.setText(" ");
     }
-    
+
     public void bloquearBotones() {
         jbtnNuevo.setEnabled(true);
         jbtnGuardar.setEnabled(false);
@@ -96,7 +96,7 @@ public class Estudiantes extends javax.swing.JFrame {
         jbtnBorrar.setEnabled(false);
         jbtnCancelar.setEnabled(false);
     }
-    
+
     public void bloquearTextos() {
         jtxtCedula.setEnabled(false);
         jtxtNombre.setEnabled(false);
@@ -104,7 +104,7 @@ public class Estudiantes extends javax.swing.JFrame {
         jtxtDireccion.setEnabled(false);
         jtxtTelefono.setEnabled(false);
     }
-    
+
     public void desbloquearBotonesEditarEliminar() {
         jbtnNuevo.setEnabled(false);
         jbtnGuardar.setEnabled(false);
@@ -113,7 +113,7 @@ public class Estudiantes extends javax.swing.JFrame {
         jbtnBorrar.setEnabled(true);
         jbtnCancelar.setEnabled(true);
     }
-    
+
     public void bloquearTextoCedula() {
         jtxtCedula.setEnabled(false);
         jtxtNombre.setEnabled(true);
@@ -121,7 +121,7 @@ public class Estudiantes extends javax.swing.JFrame {
         jtxtDireccion.setEnabled(true);
         jtxtTelefono.setEnabled(true);
     }
-    
+
     public void cargarTextos() {
         jtblRegistros.getSelectionModel().addListSelectionListener(
                 new ListSelectionListener() {
@@ -142,7 +142,7 @@ public class Estudiantes extends javax.swing.JFrame {
             }
         });
     }
-    
+
     public void guardar() {
 
         String valorTelefono = "S/N";
@@ -193,7 +193,7 @@ public class Estudiantes extends javax.swing.JFrame {
             }
         }
     }
-    
+
     public void editarDatos() {
         String valorTelefono = "S/N";
         if (jtxtCedula.getText().isEmpty() || jtxtCedula.getText() == "") {
@@ -242,7 +242,34 @@ public class Estudiantes extends javax.swing.JFrame {
             }
         }
     }
-    
+
+    public void eliminar() {
+        if (JOptionPane.showConfirmDialog(new JInternalFrame(),
+                "Estas seguro de borrar el registro",
+                "Borrar registros", JOptionPane.WARNING_MESSAGE,
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+
+        }
+        try {
+            Conexion cc = new Conexion();
+            Connection cn = cc.conectar();
+            String sql = " ";
+            sql = "DELETE FROM estudiantes WHERE est_cedula='" + jtxtCedula.getText() + "'";
+            PreparedStatement psd = cn.prepareStatement(sql);
+            int n = psd.executeUpdate();
+            // JOptionPane.showMessageDialog(null, psd);
+            if (n > 0) {
+                JOptionPane.showMessageDialog(null, "Se elimino correctamente");
+                //limpiarTextos();
+                cargarTablaEstudiantes();
+                bloquearBotones();
+                bloquearTextos();
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex);
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -394,6 +421,11 @@ public class Estudiantes extends javax.swing.JFrame {
         jbtnBorrar.setText("Borrar");
 
         jbtnCancelar.setText("Cancelar");
+        jbtnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbtnCancelarActionPerformed(evt);
+            }
+        });
 
         jButton1.setText("Inactivar");
 
@@ -403,13 +435,14 @@ public class Estudiantes extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(45, 45, 45)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jbtnCancelar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jbtnBorrar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jbtnActualizar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
-                    .addComponent(jbtnNuevo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jbtnGuardar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jbtnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jbtnBorrar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jbtnActualizar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
+                        .addComponent(jbtnNuevo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jbtnGuardar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(54, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -424,9 +457,9 @@ public class Estudiantes extends javax.swing.JFrame {
                 .addGap(29, 29, 29)
                 .addComponent(jbtnBorrar)
                 .addGap(18, 18, 18)
-                .addComponent(jbtnCancelar)
-                .addGap(18, 18, 18)
                 .addComponent(jButton1)
+                .addGap(18, 18, 18)
+                .addComponent(jbtnCancelar)
                 .addGap(26, 26, 26))
         );
 
@@ -464,20 +497,27 @@ public class Estudiantes extends javax.swing.JFrame {
     }//GEN-LAST:event_jtxtTelefonoActionPerformed
 
     private void jbtnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnNuevoActionPerformed
-       
-        
+
         desbloquearTextos();
         desbloquearBotones();
-        
+
     }//GEN-LAST:event_jbtnNuevoActionPerformed
 
     private void jbtnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnGuardarActionPerformed
-        guardar();        
+        guardar();
     }//GEN-LAST:event_jbtnGuardarActionPerformed
 
     private void jbtnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnActualizarActionPerformed
         editarDatos();
     }//GEN-LAST:event_jbtnActualizarActionPerformed
+
+    private void jbtnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnCancelarActionPerformed
+        // TODO add your handling code here:
+        limpiarTextos();
+        bloquearBotones();
+        bloquearTextos();
+        
+    }//GEN-LAST:event_jbtnCancelarActionPerformed
 
     /**
      * @param args the command line arguments
