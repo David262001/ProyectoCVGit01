@@ -10,5 +10,8 @@ package ConexionSQL;
  * @author Acer
  */
 public class OrtizEnrique {
+    public void edad(){
+        
+    }
     
 }
